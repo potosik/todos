@@ -1,3 +1,7 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {createStore} from 'redux';
+
 // counter reducer
 const counter = (state = 0, action) => {
     switch (action.type) {
@@ -10,48 +14,38 @@ const counter = (state = 0, action) => {
     }
 };
 
-// creating store
-const createStore = (reducer) => {
-    let state;
-    let listeners = [];
-
-    // getting current state
-    const getState = () => state;
-
-    // dispatching an action
-    const dispatch = (action) => {
-        // create a new state with action
-        state = reducer(state, action);
-        // notify all listeners
-        listeners.forEach(listener => listener());
-    };
-
-    // subscribing listeners
-    const subscribe = (listener) => {
-        listeners.push(listener);
-        // return function to unsubscribe
-        return () => {
-            listeners = listeners.filter(l => l !== listener);
-        };
-    };
-
-    // creating initial state
-    dispatch({});
-
-    return {getState, dispatch, subscribe};
-};
-
 const store = createStore(counter);
+
+// Counter component
+const Counter = ({
+    // passing parameters here
+    value,
+    onIncrement,
+    onDecrement
+}) => (
+    <div>
+        <h1>{value}</h1>
+        <button onClick={onIncrement}>+</button>
+        <button onClick={onDecrement}>-</button>
+    </div>
+)
 
 // renderer
 const render = () => {
-    document.getElementById('root').innerText = store.getState();
+    ReactDOM.render(
+        <Counter value={store.getState()}
+                 onIncrement={() =>
+                     store.dispatch({
+                         type: "INCREMENT"
+                     })}
+                 onDecrement={() =>
+                     store.dispatch({
+                         type: "DECREMENT"
+                     })}/>,
+        document.getElementById('root')
+    );
 };
 
 // subscribe for changes
 store.subscribe(render);
 render();
-
-document.addEventListener('click', () => {
-    store.dispatch({type: 'INCREMENT'});
-});
