@@ -1,5 +1,3 @@
-import { createStore } from 'redux';
-
 // counter reducer
 const counter = (state = 0, action) => {
     switch (action.type) {
@@ -10,9 +8,39 @@ const counter = (state = 0, action) => {
         default:
             return state;
     }
-}
+};
 
 // creating store
+const createStore = (reducer) => {
+    let state;
+    let listeners = [];
+
+    // getting current state
+    const getState = () => state;
+
+    // dispatching an action
+    const dispatch = (action) => {
+        // create a new state with action
+        state = reducer(state, action);
+        // notify all listeners
+        listeners.forEach(listener => listener());
+    };
+
+    // subscribing listeners
+    const subscribe = (listener) => {
+        listeners.push(listener);
+        // return function to unsubscribe
+        return () => {
+            listeners = listeners.filter(l => l !== listener);
+        };
+    };
+
+    // creating initial state
+    dispatch({});
+
+    return {getState, dispatch, subscribe};
+};
+
 const store = createStore(counter);
 
 // renderer
@@ -25,5 +53,5 @@ store.subscribe(render);
 render();
 
 document.addEventListener('click', () => {
-    store.dispatch({ type: 'INCREMENT' });
+    store.dispatch({type: 'INCREMENT'});
 });
