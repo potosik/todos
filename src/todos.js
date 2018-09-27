@@ -73,7 +73,7 @@ class TodoApp extends React.Component {
                 <input ref={node => {
                     // assign element to be able to acces it
                     this.input = node;
-                }} />
+                }}/>
                 <button onClick={() => {
                     // dispatching an action
                     store.dispatch({
@@ -90,7 +90,21 @@ class TodoApp extends React.Component {
                     {this.props.todos.map(todo => {
                         // render elemets by mapping them
                         return (
-                            <li key={todo.id}>
+                            <li key={todo.id}
+                                onClick={() => {
+                                    // dispatching action
+                                    store.dispatch({
+                                        type: 'TOGGLE_TODO',
+                                        id: todo.id
+                                    });
+                                }}
+                                style={{
+                                    // add some styles to see the changes
+                                    textDecoration:
+                                        todo.completed ?
+                                            'line-through' :
+                                            'none'
+                                }}>
                                 {todo.text}
                             </li>
                         );
