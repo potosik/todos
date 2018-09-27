@@ -1,3 +1,7 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {createStore, combineReducers} from 'redux';
+
 // its called: reducer composition
 // each reducer passes only a part of state tree when calls other reducer
 const todo = (state, action) => {
@@ -53,36 +57,60 @@ const visibilityFilter = (
     }
 };
 
-// all reducers passed
-const combineReducers = (reducers) => {
-    // the result is a function that has the same
-    // signature as reducer
-    // it will be called as a simple reducer
-    return (state = {}, action) => {
-        // whole state will be updated as it must be covered
-        // by reducer's names
-        return Object.keys(reducers).reduce(
-            // for each key will be executed a function
-            // nextState will be passed across all executions
-            (nextState, key) => {
-                // the part of the state for concrete reducer
-                // created by executing concrete reducer by
-                // passing current state and action
-                nextState[key] = reducers[key](
-                    state[key],
-                    action
-                );
-                // return the accumulated state
-                return nextState;
-            },
-            // the initial state for nextState value
-            {}
-        );
-    };
-};
-
 // combination of reducers
 const todoApp = combineReducers({
     todos,
     visibilityFilter
 });
+const store = createStore(todoApp);
+let nextTodoId = 0;
+
+// application component
+class TodoApp extends React.Component {
+    render() {
+        return (
+            <div>
+                <input ref={node => {
+                    // assign element to be able to acces it
+                    this.input = node;
+                }} />
+                <button onClick={() => {
+                    // dispatching an action
+                    store.dispatch({
+                        type: 'ADD_TODO',
+                        text: this.input.value,
+                        id: nextTodoId++
+                    });
+                    // clear input
+                    this.input.value = '';
+                }}>
+                    Add Todo
+                </button>
+                <ul>
+                    {this.props.todos.map(todo => {
+                        // render elemets by mapping them
+                        return (
+                            <li key={todo.id}>
+                                {todo.text}
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
+        );
+    }
+}
+
+// renderer
+const render = () => {
+    ReactDOM.render(
+        <TodoApp
+            todos={store.getState().todos}
+        />,
+        document.getElementById('root')
+    );
+};
+
+// subscribe for changes
+store.subscribe(render);
+render();
