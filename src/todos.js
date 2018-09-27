@@ -1,3 +1,5 @@
+import {combineReducers} from 'redux';
+
 // its called: reducer composition
 // each reducer passes only a part of state tree when calls other reducer
 const todo = (state, action) => {
@@ -53,15 +55,23 @@ const visibilityFilter = (
     }
 };
 
-const todoApp = (state = {}, action) => {
-    return {
-        todos: todos(
-            state.todos,
-            action
-        ),
-        visibilityFilter: visibilityFilter(
-            state.visibilityFilter,
-            action
-        )
-    };
-};
+// combination of reducers
+const todoApp = combineReducers({
+    todos,
+    visibilityFilter
+});
+
+// combining reducers to a single state
+// every reducer influence on its part of state only
+// const todoApp = (state = {}, action) => {
+//     return {
+//         todos: todos(
+//             state.todos,
+//             action
+//         ),
+//         visibilityFilter: visibilityFilter(
+//             state.visibilityFilter,
+//             action
+//         )
+//     };
+// };
