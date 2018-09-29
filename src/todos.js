@@ -189,7 +189,7 @@ const TodoList = ({
 
 // presentation component to add todos to list
 // second argument is a context, receiving store from there
-const AddTodo = (props, {store}) => {
+let AddTodo = ({dispatch}) => {
     let input;
 
     return (
@@ -200,7 +200,7 @@ const AddTodo = (props, {store}) => {
             }}/>
             <button onClick={() => {
                 // dispatching an action
-                store.dispatch({
+                dispatch({
                     type: 'ADD_TODO',
                     id: nextTodoId++,
                     text: input.value
@@ -213,6 +213,20 @@ const AddTodo = (props, {store}) => {
         </div>
     );
 };
+/*
+AddTodo = connect(
+    state => {
+        return {};
+    },
+    dispatch => {
+        return {dispatch};
+    }
+)(AddTodo);
+*/
+//AddTodo = connect(null, null);
+// not subscribe to the store
+// just inject dispatch to props
+AddTodo = connect();
 
 // helper to filter available todos
 const getVisibleTodos = (
@@ -231,7 +245,7 @@ const getVisibleTodos = (
 
 // returns props that is depends on store
 // maps store state to the props of component
-const mapStateToProps = (state) => {
+const mapStateToVisibleTodoListProps = (state) => {
     return {
         todos: getVisibleTodos(
             state.todos,
@@ -239,10 +253,9 @@ const mapStateToProps = (state) => {
         )
     };
 };
-
 // returns functions that is calls dispatch of the store
 // maps dispatch method of the store to the action methods of component
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToVisibleTodoListProps = (dispatch) => {
     return {
         onTodoClick: (id) => {
             dispatch({
@@ -252,12 +265,11 @@ const mapDispatchToProps = (dispatch) => {
         }
     };
 };
-
 // auto-generated container component for mapping state and
 // dispatch function to target component
 const VisibleTodoList = connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToVisibleTodoListProps,
+    mapDispatchToVisibleTodoListProps
     // passing target component as a parameter for function
 )(TodoList);
 
