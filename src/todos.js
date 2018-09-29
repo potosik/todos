@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
-import {Provider} from 'react-redux';
+import {Provider, connect} from 'react-redux';
 import {createStore, combineReducers} from 'redux';
 
 // its called: reducer composition
@@ -122,6 +122,7 @@ class FilterLink extends React.Component {
         )
     }
 }
+
 FilterLink.contextTypes = {
     store: PropTypes.object
 };
@@ -228,48 +229,37 @@ const getVisibleTodos = (
     }
 };
 
-// container component to display a todo list
-// it will be updated when store state changes
-class VisibleTodoList extends React.Component {
-    componentDidMount() {
-        const {store} = this.context;
-        this.unsubscribe = store.subscribe(() =>
-            this.forceUpdate()
-        );
-    }
-
-    componentWillUnmount() {
-        this.unsubscribe();
-    }
-
-    render() {
-        // getting store from context
-        const {store} = this.context;
-        const props = this.props;
-        const state = store.getState();
-
-        return (
-            <TodoList
-                todos={
-                    getVisibleTodos(
-                        state.todos,
-                        state.visibilityFilter
-                    )
-                }
-                onTodoClick={id =>
-                    store.dispatch({
-                        type: 'TOGGLE_TODO',
-                        id
-                    })
-                }
-            />
-        );
-    }
-}
-// important to set the types of contexts we are going to receive
-VisibleTodoList.contextTypes = {
-    store: PropTypes.object
+// returns props that is depends on store
+// maps store state to the props of component
+const mapStateToProps = (state) => {
+    return {
+        todos: getVisibleTodos(
+            state.todos,
+            state.visibilityFilter
+        )
+    };
 };
+
+// returns functions that is calls dispatch of the store
+// maps dispatch method of the store to the action methods of component
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onTodoClick: (id) => {
+            dispatch({
+                type: 'TOGGLE_TODO',
+                id
+            })
+        }
+    };
+};
+
+// auto-generated container component for mapping state and
+// dispatch function to target component
+const VisibleTodoList = connect(
+    mapStateToProps,
+    mapDispatchToProps
+    // passing target component as a parameter for function
+)(TodoList);
 
 let nextTodoId = 0;
 
