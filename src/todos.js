@@ -82,50 +82,25 @@ const Link = ({
     )
 };
 
-// container component for displaying filter link
-class FilterLink extends React.Component {
-    // subscribe to store updates for this component
-    // currently only full all subscribed so as no changes
-    // to path down, component will not be updated
-    componentDidMount() {
-        const {store} = this.context;
-        this.unsubscribe = store.subscribe(() =>
-            this.forceUpdate()
-        );
+const mapStateToFilterLinkProps = (state, ownProps) => {
+    return {
+        active: ownProps.filter === state.visibilityFilter
     }
-
-    // should now unsubscribe
-    componentWillUnmount() {
-        this.unsubscribe();
-    }
-
-    render() {
-        // will receive filter and children here
-        const props = this.props;
-        const {store} = this.context;
-        const state = store.getState();
-
-        return (
-            <Link
-                active={
-                    props.filter === state.visibilityFilter
-                }
-                onClick={() =>
-                    store.dispatch({
-                        type: 'SET_VISIBILITY_FILTER',
-                        filter: props.filter
-                    })
-                }
-            >
-                {props.children}
-            </Link>
-        )
-    }
-}
-
-FilterLink.contextTypes = {
-    store: PropTypes.object
 };
+const mapDispatchToFilterLinkProps = (dispatch, ownProps) => {
+    return {
+        onClick: () =>
+            dispatch({
+                type: 'SET_VISIBILITY_FILTER',
+                filter: ownProps.filter
+            })
+    }
+};
+// auto-generated container component for displaying filter link
+const FilterLink = connect(
+    mapStateToFilterLinkProps,
+    mapDispatchToFilterLinkProps
+)(Link);
 
 // presentational component to display filter links
 const Footer = () => {
@@ -226,7 +201,7 @@ AddTodo = connect(
 //AddTodo = connect(null, null);
 // not subscribe to the store
 // just inject dispatch to props
-AddTodo = connect();
+AddTodo = connect()(AddTodo);
 
 // helper to filter available todos
 const getVisibleTodos = (
