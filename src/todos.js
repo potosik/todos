@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import {createStore, combineReducers} from 'redux';
 
@@ -86,7 +87,7 @@ class FilterLink extends React.Component {
     // currently only full all subscribed so as no changes
     // to path down, component will not be updated
     componentDidMount() {
-        const {store} = this.props;
+        const {store} = this.context;
         this.unsubscribe = store.subscribe(() =>
             this.forceUpdate()
         );
@@ -100,7 +101,7 @@ class FilterLink extends React.Component {
     render() {
         // will receive filter and children here
         const props = this.props;
-        const {store} = this.props;
+        const {store} = this.context;
         const state = store.getState();
 
         return (
@@ -120,30 +121,30 @@ class FilterLink extends React.Component {
         )
     }
 }
+FilterLink.contextTypes = {
+    store: PropTypes.object
+};
 
 // presentational component to display filter links
-const Footer = ({store}) => {
+const Footer = () => {
     return (
         <p>
             Show
             {' '}
             <FilterLink
                 filter='SHOW_ALL'
-                store={store}
             >
                 All
             </FilterLink>
             {' '}
             <FilterLink
                 filter='SHOW_ACTIVE'
-                store={store}
             >
                 Active
             </FilterLink>
             {' '}
             <FilterLink
                 filter='SHOW_COMPLETED'
-                store={store}
             >
                 Completed
             </FilterLink>
@@ -185,7 +186,8 @@ const TodoList = ({
 );
 
 // presentation component to add todos to list
-const AddTodo = ({store}) => {
+// second argument is a context, receiving store from there
+const AddTodo = (props, {store}) => {
     let input;
 
     return (
@@ -229,7 +231,7 @@ const getVisibleTodos = (
 // it will be updated when store state changes
 class VisibleTodoList extends React.Component {
     componentDidMount() {
-        const {store} = this.props;
+        const {store} = this.context;
         this.unsubscribe = store.subscribe(() =>
             this.forceUpdate()
         );
@@ -240,7 +242,8 @@ class VisibleTodoList extends React.Component {
     }
 
     render() {
-        const {store} = this.props;
+        // getting store from context
+        const {store} = this.context;
         const props = this.props;
         const state = store.getState();
 
@@ -262,18 +265,25 @@ class VisibleTodoList extends React.Component {
         );
     }
 }
+// important to set the types of contexts we are going to receive
+VisibleTodoList.contextTypes = {
+    store: PropTypes.object
+};
 
 let nextTodoId = 0;
 
 // application component
 // container component for app
-const TodoApp = ({store}) => (
+const TodoApp = () => (
     <div>
-        <AddTodo store={store}/>
-        <VisibleTodoList store={store}/>
-        <Footer store={store}/>
+        <AddTodo/>
+        <VisibleTodoList/>
+        <Footer/>
     </div>
 );
+TodoApp.contextTypes = {
+    store: PropTypes.object
+};
 
 // combination of reducers
 const todoApp = combineReducers({
@@ -281,8 +291,28 @@ const todoApp = combineReducers({
     visibilityFilter
 });
 
+// context provider component
+class Provider extends React.Component {
+    // setting contexts for child components
+    getChildContext() {
+        return {
+            store: this.props.children
+        };
+    }
+
+    render() {
+        return this.props.children;
+    }
+}
+// important to set the types ot contexts we are going to pass
+Provider.childContextTypes = {
+    store: PropTypes.object
+}
+
 // inject store as a parameter for top level component
 ReactDOM.render(
-    <TodoApp store={createStore(todoApp)}/>,
+    <Provider store={createStore(todoApp)}>
+        <TodoApp/>
+    </Provider>,
     document.getElementById('root')
 );
