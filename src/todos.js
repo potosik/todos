@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
+import {Provider} from 'react-redux';
 import {createStore, combineReducers} from 'redux';
 
 // its called: reducer composition
@@ -290,24 +291,6 @@ const todoApp = combineReducers({
     todos,
     visibilityFilter
 });
-
-// context provider component
-class Provider extends React.Component {
-    // setting contexts for child components
-    getChildContext() {
-        return {
-            store: this.props.children
-        };
-    }
-
-    render() {
-        return this.props.children;
-    }
-}
-// important to set the types ot contexts we are going to pass
-Provider.childContextTypes = {
-    store: PropTypes.object
-}
 
 // inject store as a parameter for top level component
 ReactDOM.render(
