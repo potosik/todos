@@ -65,14 +65,13 @@ const todoApp = combineReducers({
 const store = createStore(todoApp);
 
 // filter link component
-const FilterLink = ({
-                        filter,
-                        currentFilter,
-                        children,
-                        onClick
-                    }) => {
+const Link = ({
+                  active,
+                  children,
+                  onClick
+              }) => {
     // check if it is a current filter
-    if (filter === currentFilter) {
+    if (active) {
         return <span>{children}</span>;
     }
 
@@ -81,42 +80,72 @@ const FilterLink = ({
            onClick={e => {
                // preventing link behavior
                e.preventDefault();
-               onClick(filter);
+               onClick();
            }}>
             {children}
         </a>
     )
 };
 
+// container component for displaying filter link
+class FilterLink extends React.Component {
+    // subscribe to store updates for this component
+    // currently only full all subscribed so as no changes
+    // to path down, component will not be updated
+    componentDidMount() {
+        this.unsubscribe = store.subscribe(() =>
+            this.forceUpdate()
+        );
+    }
+
+    // should now unsubscribe
+    componentWillUnmount() {
+        this.unsubscribe();
+    }
+
+    render() {
+        // will receive filter and children here
+        const props = this.props;
+        const state = store.getState();
+
+        return (
+            <Link
+                active={
+                    props.filter === state.visibilityFilter
+                }
+                onClick={() =>
+                    store.dispatch({
+                        type: 'SET_VISIBILITY_FILTER',
+                        filter: props.filter
+                    })
+                }
+            >
+                {props.children}
+            </Link>
+        )
+    }
+}
+
 // presentational component to display filter links
-const Footer = ({
-                    visibilityFilter,
-                    onFilterClick
-                }) => {
+const Footer = () => {
     return (
         <p>
             Show
             {' '}
             <FilterLink
                 filter='SHOW_ALL'
-                currentFilter={visibilityFilter}
-                onClick={onFilterClick}
             >
                 All
             </FilterLink>
             {' '}
             <FilterLink
                 filter='SHOW_ACTIVE'
-                currentFilter={visibilityFilter}
-                onClick={onFilterClick}
             >
                 Active
             </FilterLink>
             {' '}
             <FilterLink
                 filter='SHOW_COMPLETED'
-                currentFilter={visibilityFilter}
-                onClick={onFilterClick}
             >
                 Completed
             </FilterLink>
