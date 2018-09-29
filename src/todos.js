@@ -4,6 +4,28 @@ import ReactDOM from 'react-dom';
 import {Provider, connect} from 'react-redux';
 import {createStore, combineReducers} from 'redux';
 
+// ACTION CREATORS
+let nextTodoId = 0;
+const addTodo = (text) => {
+    return {
+        type: 'ADD_TODO',
+        id: nextTodoId++,
+        text: text
+    }
+};
+const toggleTodo = (id) => {
+    return {
+        type: 'TOGGLE_TODO',
+        id
+    }
+};
+const setVisibilityFilter = (filter) => {
+    return {
+        type: 'SET_VISIBILITY_FILTER',
+        filter
+    }
+};
+
 // its called: reducer composition
 // each reducer passes only a part of state tree when calls other reducer
 const todo = (state, action) => {
@@ -90,10 +112,7 @@ const mapStateToFilterLinkProps = (state, ownProps) => {
 const mapDispatchToFilterLinkProps = (dispatch, ownProps) => {
     return {
         onClick: () =>
-            dispatch({
-                type: 'SET_VISIBILITY_FILTER',
-                filter: ownProps.filter
-            })
+            dispatch(setVisibilityFilter(ownProps.filter))
     }
 };
 // auto-generated container component for displaying filter link
@@ -175,11 +194,7 @@ let AddTodo = ({dispatch}) => {
             }}/>
             <button onClick={() => {
                 // dispatching an action
-                dispatch({
-                    type: 'ADD_TODO',
-                    id: nextTodoId++,
-                    text: input.value
-                });
+                dispatch(addTodo(input.value));
                 // clear input
                 input.value = '';
             }}>
@@ -233,10 +248,7 @@ const mapStateToVisibleTodoListProps = (state) => {
 const mapDispatchToVisibleTodoListProps = (dispatch) => {
     return {
         onTodoClick: (id) => {
-            dispatch({
-                type: 'TOGGLE_TODO',
-                id
-            })
+            dispatch(toggleTodo(id))
         }
     };
 };
@@ -247,8 +259,6 @@ const VisibleTodoList = connect(
     mapDispatchToVisibleTodoListProps
     // passing target component as a parameter for function
 )(TodoList);
-
-let nextTodoId = 0;
 
 // application component
 // container component for app
