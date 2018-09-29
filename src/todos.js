@@ -57,13 +57,6 @@ const visibilityFilter = (
     }
 };
 
-// combination of reducers
-const todoApp = combineReducers({
-    todos,
-    visibilityFilter
-});
-const store = createStore(todoApp);
-
 // filter link component
 const Link = ({
                   active,
@@ -93,6 +86,7 @@ class FilterLink extends React.Component {
     // currently only full all subscribed so as no changes
     // to path down, component will not be updated
     componentDidMount() {
+        const {store} = this.props;
         this.unsubscribe = store.subscribe(() =>
             this.forceUpdate()
         );
@@ -106,6 +100,7 @@ class FilterLink extends React.Component {
     render() {
         // will receive filter and children here
         const props = this.props;
+        const {store} = this.props;
         const state = store.getState();
 
         return (
@@ -127,25 +122,28 @@ class FilterLink extends React.Component {
 }
 
 // presentational component to display filter links
-const Footer = () => {
+const Footer = ({store}) => {
     return (
         <p>
             Show
             {' '}
             <FilterLink
                 filter='SHOW_ALL'
+                store={store}
             >
                 All
             </FilterLink>
             {' '}
             <FilterLink
                 filter='SHOW_ACTIVE'
+                store={store}
             >
                 Active
             </FilterLink>
             {' '}
             <FilterLink
                 filter='SHOW_COMPLETED'
+                store={store}
             >
                 Completed
             </FilterLink>
@@ -187,15 +185,13 @@ const TodoList = ({
 );
 
 // presentation component to add todos to list
-const AddTodo = ({
-                     onAddClick
-                 }) => {
+const AddTodo = ({store}) => {
     let input;
 
     return (
         <div>
             <input ref={node => {
-                // assign element to be able to acces it
+                // assign element to be able to access it
                 input = node;
             }}/>
             <button onClick={() => {
@@ -233,6 +229,7 @@ const getVisibleTodos = (
 // it will be updated when store state changes
 class VisibleTodoList extends React.Component {
     componentDidMount() {
+        const {store} = this.props;
         this.unsubscribe = store.subscribe(() =>
             this.forceUpdate()
         );
@@ -243,6 +240,7 @@ class VisibleTodoList extends React.Component {
     }
 
     render() {
+        const {store} = this.props;
         const props = this.props;
         const state = store.getState();
 
@@ -269,16 +267,22 @@ let nextTodoId = 0;
 
 // application component
 // container component for app
-const TodoApp = () => (
+const TodoApp = ({store}) => (
     <div>
-        <AddTodo/>
-        <VisibleTodoList/>
-        <Footer/>
+        <AddTodo store={store}/>
+        <VisibleTodoList store={store}/>
+        <Footer store={store}/>
     </div>
 );
 
+// combination of reducers
+const todoApp = combineReducers({
+    todos,
+    visibilityFilter
+});
 
+// inject store as a parameter for top level component
 ReactDOM.render(
-    <TodoApp/>,
+    <TodoApp store={createStore(todoApp)}/>,
     document.getElementById('root')
 );
