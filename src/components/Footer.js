@@ -8,17 +8,17 @@ const Footer = () => {
             Show
             {' '}
             <FilterLink
-                filter='SHOW_ALL'>
+                filter='all'>
                 All
             </FilterLink>
             {' '}
             <FilterLink
-                filter='SHOW_ACTIVE'>
+                filter='active'>
                 Active
             </FilterLink>
             {' '}
             <FilterLink
-                filter='SHOW_COMPLETED'>
+                filter='completed'>
                 Completed
             </FilterLink>
         </p>

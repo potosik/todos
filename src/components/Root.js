@@ -9,7 +9,7 @@ const Root = ({store}) => (
     <Provider store={store}>
         <BrowserRouter>
             <div>
-                <Route path="/" component={App}/>
+                <Route path="/:filter?" component={App}/>
             </div>
         </BrowserRouter>
     </Provider>
