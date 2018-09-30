@@ -5,19 +5,19 @@ import TodoList from './TodoList';
 // helper to filter available todos
 const getVisibleTodos = (todos, filter) => {
     switch (filter) {
-        case 'SHOW_ALL':
+        case 'all':
             return todos;
-        case 'SHOW_ACTIVE':
+        case 'active':
             return todos.filter(t => !t.completed);
-        case 'SHOW_COMPLETED':
+        case 'completed':
             return todos.filter(t => t.completed);
     }
 };
 
 // returns props that is depends on store
 // maps store state to the props of component
-const mapStateToVisibleTodoListProps = (state) => ({
-    todos: getVisibleTodos(state.todos, state.visibilityFilter)
+const mapStateToVisibleTodoListProps = (state, ownProps) => ({
+    todos: getVisibleTodos(state.todos, ownProps.filter)
 });
 // returns functions that is calls dispatch of the store
 // maps dispatch method of the store to the action methods of component

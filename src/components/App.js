@@ -5,10 +5,15 @@ import VisibleTodoList from './VisibleTodoList';
 
 // application component
 // container component for app
-const App = () => (
+// match provided by router
+const App = ({match}) => (
     <div>
         <AddTodo/>
-        <VisibleTodoList/>
+        <VisibleTodoList
+            // get filter from match.params by router
+            // 'all' as default
+            filter={match.params.filter || 'all'}
+        />
         <Footer/>
     </div>
 );
