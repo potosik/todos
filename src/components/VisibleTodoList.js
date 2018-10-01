@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
 import {withRouter} from 'react-router';
-import {getVisibleTodos} from '../reducers';
+import {getVisibleTodos, getIsFetching} from '../reducers';
 import TodoList from './TodoList';
 
 class VisibleTodoList extends React.Component {
@@ -17,7 +17,9 @@ class VisibleTodoList extends React.Component {
     }
 
     fetchData() {
-        const {filter, fetchTodos} = this.props;
+        const {filter, requestTodos, fetchTodos} = this.props;
+        // reducing the request todos action to set state of loading
+        requestTodos(filter);
         // getting filter property from mounted props by mapStateToProps function
         fetchTodos(filter);
     }
@@ -25,10 +27,14 @@ class VisibleTodoList extends React.Component {
     render() {
         // extracting toggleTodo as its name not equals to name of target prop
         // passing rest of properties as is
-        const {toggleTodo, ...rest} = this.props;
+        const {toggleTodo, todos, isFetching} = this.props;
+        if (isFetching && !todos.length) {
+            return <p>Loading...</p>;
+        }
+
         return (
             <TodoList
-                {...rest}
+                todos={todos}
                 onTodoClick={toggleTodo}/>
         );
     }
@@ -42,6 +48,8 @@ const mapStateToProps = (state, {match}) => {
         // get filter from match.params by router
         // 'all' as default
         todos: getVisibleTodos(state, filter),
+        // calculating if fetching is in progress
+        isFetching: getIsFetching(state, filter),
         // to get filter inside of VisibleTodoList component created above
         filter
     }
