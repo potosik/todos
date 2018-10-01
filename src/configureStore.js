@@ -8,7 +8,7 @@ import todoApp from "./reducers";
 // otherwise it just will be passed to next middleware to process
 const thunk = (store) => (next) => (action) =>
     typeof action === 'function' ?
-        action(store.dispatch) :
+        action(store.dispatch, store.getState) :
         next(action);
 
 // order of dispatch modification is very important!
