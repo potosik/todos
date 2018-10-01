@@ -1,7 +1,5 @@
-import {loadState, saveState} from "./localStorage";
 import {createStore} from "redux";
 import todoApp from "./reducers";
-import throttle from "lodash/throttle";
 
 const addLoggingToDispatch = (store) => {
     const rawDispatch = store.dispatch;
@@ -21,20 +19,11 @@ const addLoggingToDispatch = (store) => {
 };
 
 const configureStore = () => {
-    const persistedState = loadState();
-    const store = createStore(todoApp, persistedState);
+    const store = createStore(todoApp);
 
     if (process.env.NODE_ENV !== 'production') {
         store.dispatch = addLoggingToDispatch(store);
     }
-
-    // subscribe to changes to save state to local storage
-    store.subscribe(throttle(() => {
-        // save only data state, not UI part
-        saveState({
-            todos: store.getState().todos
-        });
-    }, 1000));
 
     return store;
 };
