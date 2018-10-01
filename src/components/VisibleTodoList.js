@@ -18,23 +18,16 @@ const getVisibleTodos = (todos, filter) => {
 
 // returns props that is depends on store
 // maps store state to the props of component
-const mapStateToVisibleTodoListProps = (state, {match}) => ({
+const mapStateToProps = (state, {match}) => ({
     // get filter from match.params by router
     // 'all' as default
     todos: getVisibleTodos(state.todos, match.params.filter || 'all')
 });
-// returns functions that is calls dispatch of the store
-// maps dispatch method of the store to the action methods of component
-const mapDispatchToVisibleTodoListProps = (dispatch) => ({
-    onTodoClick(id) {
-        dispatch(toggleTodo(id));
-    }
-});
 // auto-generated container component for mapping state and
 // dispatch function to target component
 const VisibleTodoList = withRouter(connect(
-    mapStateToVisibleTodoListProps,
-    mapDispatchToVisibleTodoListProps
+    mapStateToProps,
+    { onTodoClick: toggleTodo }
     // passing target component as a parameter for function
 )(TodoList));
 
