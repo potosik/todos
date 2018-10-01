@@ -17,9 +17,7 @@ class VisibleTodoList extends React.Component {
     }
 
     fetchData() {
-        const {filter, requestTodos, fetchTodos} = this.props;
-        // reducing the request todos action to set state of loading
-        requestTodos(filter);
+        const {filter, fetchTodos} = this.props;
         // getting filter property from mounted props by mapStateToProps function
         fetchTodos(filter);
     }
