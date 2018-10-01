@@ -19,7 +19,8 @@ class VisibleTodoList extends React.Component {
     fetchData() {
         const {filter, fetchTodos} = this.props;
         // getting filter property from mounted props by mapStateToProps function
-        fetchTodos(filter);
+        // also possible to make something after async call as it returns promise
+        fetchTodos(filter)/*.then(() => console.log('done async'))*/;
     }
 
     render() {

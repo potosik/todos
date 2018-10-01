@@ -20,7 +20,8 @@ const receiveTodos = (filter, responce) => ({
 // to dispatch actions by itself (it is a THUNK actually)
 export const fetchTodos = (filter) => (dispatch, getState) => {
     if (getIsFetching(getState(), filter)) {
-        return;
+        // returns promise to consistency, it resolves immediately
+        return Promise.resolve();
     }
 
     dispatch(requestTodos(filter));
