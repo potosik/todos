@@ -45,5 +45,7 @@ export const getVisibleTodos = (state, filter) => {
             return allTodos.filter(t => !t.completed);
         case 'completed':
             return allTodos.filter(t => t.completed);
+        default:
+            return allTodos;
     }
 };

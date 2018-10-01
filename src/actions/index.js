@@ -1,7 +1,6 @@
 import {v4} from 'node-uuid';
 
 // ACTION CREATORS
-let nextTodoId = 0;
 export const addTodo = (text) => ({
     type: 'ADD_TODO',
     id: v4(),
