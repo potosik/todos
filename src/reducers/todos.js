@@ -1,51 +1,75 @@
 import {combineReducers} from 'redux';
-import todo from './todo'
 
 const byId = (state = {}, action) => {
     switch (action.type) {
-        case 'ADD_TODO':
-        case 'TOGGLE_TODO':
-            return {
-                ...state,
-                // making changes on object by id
-                // passing current state of the target object and an action
-                [action.id]: todo(state[action.id], action)
-            };
+        case 'RECEIVE_TODOS':
+            const nextState = {...state};
+            action.responce.forEach(todo => {
+                nextState[todo.id] = todo;
+            });
+            return nextState;
         default:
             return state;
     }
 };
 
 const allIds = (state = [], action) => {
+    if (action.filter !== 'all') {
+        return state;
+    }
+
     switch (action.type) {
-        case 'ADD_TODO':
-            return [...state, action.id];
+        case 'RECEIVE_TODOS':
+            return action.responce.map(todo => todo.id);
         default:
             return state;
     }
 };
 
-const todos = combineReducers({byId, allIds});
+const activeIds = (state = [], action) => {
+    if (action.filter !== 'active') {
+        return state;
+    }
+
+    switch (action.type) {
+        case 'RECEIVE_TODOS':
+            return action.responce.map(todo => todo.id);
+        default:
+            return state;
+    }
+};
+
+const completedIds = (state = [], action) => {
+    if (action.filter !== 'completed') {
+        return state;
+    }
+
+    switch (action.type) {
+        case 'RECEIVE_TODOS':
+            return action.responce.map(todo => todo.id);
+        default:
+            return state;
+    }
+};
+
+// reducers to have a filtered ids of objects to be able
+// to show cached values by filtering in getVisibleTodos
+// while receiving updated state
+const idsByFilter = combineReducers({
+    all: allIds,
+    active: activeIds,
+    completed: completedIds
+});
+
+const todos = combineReducers({byId, idsByFilter});
 
 export default todos;
-
-const getAllTodos = (state) =>
-    state.allIds.map(id => state.byId[id]);
 
 // helper to filter available todos
 // the selector function
 // selects something from the corresponding state
 // state now contains state for byId and allIds reducers!!!
 export const getVisibleTodos = (state, filter) => {
-    const allTodos = getAllTodos(state);
-    switch (filter) {
-        case 'all':
-            return allTodos;
-        case 'active':
-            return allTodos.filter(t => !t.completed);
-        case 'completed':
-            return allTodos.filter(t => t.completed);
-        default:
-            return allTodos;
-    }
+    const ids = state.idsByFilter[filter];
+    return ids.map(id => state.byId[id]);
 };
