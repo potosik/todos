@@ -18,12 +18,27 @@ const addLoggingToDispatch = (store) => {
     }
 };
 
+const addPromiseSupportToDispatch = (store) => {
+    const rawDispatch = store.dispatch;
+    return (action) => {
+        // check if action is a promise
+        if (typeof action.then === 'function') {
+            // if it is wait for resolve and then path it to original dispatch
+            return action.then(rawDispatch);
+        }
+        return rawDispatch(action);
+    }
+};
+
+// order of dispatch modification is very important!
 const configureStore = () => {
     const store = createStore(todoApp);
 
     if (process.env.NODE_ENV !== 'production') {
         store.dispatch = addLoggingToDispatch(store);
     }
+
+    store.dispatch = addPromiseSupportToDispatch(store);
 
     return store;
 };
