@@ -1,5 +1,7 @@
 import {getIsFetching} from '../reducers';
+import {normalize} from 'normalizr';
 import * as api from '../api';
+import * as schema from './schema';
 
 // action returns a promise
 // promise resolve generates a new action
@@ -22,7 +24,7 @@ export const fetchTodos = (filter) => (dispatch, getState) => {
             dispatch({
                 type: 'FETCH_TODOS_SUCCESS',
                 filter,
-                response
+                response: normalize(response, schema.arrayOfTodos)
             });
         },
         error => {
@@ -45,7 +47,7 @@ export const addTodo = (text) => (dispatch) =>
     api.addTodo(text).then(response => {
         dispatch({
             type: 'ADD_TODO_SUCCESS',
-            response
+            response: normalize(response, schema.todo)
         });
     });
 
