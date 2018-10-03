@@ -2,17 +2,6 @@ import {v4} from 'node-uuid';
 import {getIsFetching} from '../reducers';
 import * as api from '../api';
 
-const requestTodos = (filter) => ({
-    type: 'REQUEST_TODOS',
-    filter
-});
-
-const receiveTodos = (filter, responce) => ({
-    type: 'RECEIVE_TODOS',
-    filter,
-    responce
-});
-
 // action returns a promise
 // promise resolve generates a new action
 // that action will be passed to original dispatch function
@@ -24,11 +13,33 @@ export const fetchTodos = (filter) => (dispatch, getState) => {
         return Promise.resolve();
     }
 
-    dispatch(requestTodos(filter));
-
-    return api.fetchTodos(filter).then(response => {
-        dispatch(receiveTodos(filter, response));
+    dispatch({
+        type: 'FETCH_TODOS_REQUEST',
+        filter
     });
+
+    return api.fetchTodos(filter).then(
+        response => {
+            dispatch({
+                type: 'FETCH_TODOS_SUCCESS',
+                filter,
+                response
+            });
+        },
+        error => {
+            dispatch({
+                type: 'FETCH_TODOS_FAILURE',
+                filter,
+                message: error.message || 'Something went wrong.'
+            });
+        }
+    );
+    /*
+    // if one of the reducers or subscribed components throws an error
+    // catch block will be active an (internal) error will be displayed to the user
+    // but error handler above will only process rejected promises error
+    ).catch(...);
+     */
 };
 
 // ACTION CREATORS
